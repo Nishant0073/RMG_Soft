@@ -5,6 +5,9 @@ from openpyxl import load_workbook
 import datetime
 import re
 
+# generated_files = []
+excel_file_path = ""
+generated_excel_data = {}
 
 # utility functions
 def get_parsed_location(locations):
@@ -24,8 +27,6 @@ def get_parsed_skills(skills):
 
     return parsed_list
 
-# generated_files = []
-excel_file_path = ""
 
 def process_files(employees_file,requirement_file):
     # try:
@@ -37,18 +38,23 @@ def process_files(employees_file,requirement_file):
         j=0
         requirement_skills_col = 0
         requirement_loc_col = 0
+        requirement_tech_familly_col = 0;
 
         for i in requirement_data.columns:
             if(i=="Main Skill Description"):
                 requirement_skills_col = j
             if(i=="Location"):
                 requirement_loc_col =j
+            if(i=="Tech Family"):
+                requirement_tech_familly_col = j
             j = j+1
-
+        
         j=0
+
 
         employee_skills_col = 0
         employee_loc_col = 0
+        
 
         for i in employees_data.columns:
             if(i=="Skills"):
@@ -59,7 +65,6 @@ def process_files(employees_file,requirement_file):
 
         # Existing Excel file path
         global excel_file_path
-        print(datetime.date.today())
         excel_file_path = "Matched_data_"+ str(datetime.date.today()) +'.xlsx'
         df = pd.DataFrame({})
         df.to_excel(excel_file_path, index=False)
@@ -71,6 +76,7 @@ def process_files(employees_file,requirement_file):
         for req in requirement_data.values:
             requirement_location = get_parsed_location(req[requirement_loc_col])
             requirement_skills = get_parsed_skills(req[requirement_skills_col])
+            requirement_tech_familly = req[requirement_tech_familly_col]
             requirement_no = requirement_no+1
 
              
@@ -109,20 +115,35 @@ def process_files(employees_file,requirement_file):
                         new_row[col]=emp[indx]
                         indx = indx + 1
                     df = pd.DataFrame(pd.DataFrame([new_row], columns=employees_data.columns.values))
+                    global generated_excel_data
+                    if requirement_tech_familly in generated_excel_data:
+                        generated_excel_data[requirement_tech_familly].append(df)
+                    else:
+                        generated_excel_data.update({requirement_tech_familly : [df]})
                     rows.append(df)
         
-            if(len(rows)!=0): 
-                merged_df = pd.concat(rows,ignore_index=1)
-                with pd.ExcelWriter(excel_file_path,mode='a',if_sheet_exists="overlay" ) as writer:
-                        merged_df.to_excel(
-                            writer,
-                            sheet_name= sheet_name_,
-                            index=False
-                        )
-                rows = []
+            # if(len(rows)!=0): 
+            #     merged_df = pd.concat(rows,ignore_index=1)
+            #     with pd.ExcelWriter(excel_file_path,mode='a',if_sheet_exists="overlay" ) as writer:
+            #             merged_df.to_excel(
+            #                 writer,
+            #                 sheet_name= sheet_name_,
+            #                 index=False
+            #             )
+            #     rows = []
             # generated_files.append(excel_file_path)
             # df.to_excel(excel_file_path, index=False)
-                
+        # global generated_excel_data
+        for tech_familly, empl in generated_excel_data.items():
+            merged_df = pd.concat(empl,ignore_index=1)
+            with pd.ExcelWriter(excel_file_path,mode='a',if_sheet_exists="overlay") as writer:
+                merged_df.to_excel(
+                    writer,
+                    sheet_name = tech_familly,
+                    index = False
+                )
+                     
+        # print(generated_excel_data)
 
         return True
     # except Exception as e:
@@ -188,3 +209,10 @@ result_label.grid(row=3, column=0, columnspan=3)
 # Start the Tkinter event loop
 root.mainloop()
 
+
+
+
+#  if i in dict:
+#             dict[i].append(j);
+#         else:
+#             dict.update({i:[]})
