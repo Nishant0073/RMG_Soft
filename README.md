@@ -1,15 +1,15 @@
 # RMG Software 
-A program to filter Profiles based on open requirements.
+A program to filter profiles based on open requirements.
 
 ## How to install
 
 -  Install python3 from Microsoft Store.
--  Extract the downloded folder
--  And open same folder in powershell(recommended) or cmd.
--  Run following command to install required python libraries
+-  Extract files from the downloded folder.
+-  After extraction, open same folder in powershell(recommended) or cmd.
+-  Run the following command to install required python libraries:
           ``` pip install -r requirement.txt ```
--  After successfull execution of command, run the main program file which is software_v1.py file. Use following command to run the file
+-  After successfull execution of command, run the main program file "software_v1.py" file using following command:
         ``` python .\software_v1.py ```
-- Done!  
+- And your Done!  
 
 
