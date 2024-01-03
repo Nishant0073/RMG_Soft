@@ -179,7 +179,7 @@ root = tk.Tk()
 root.title("Resource Locator App")
 
 # File 1 selection
-file1_label = tk.Label(root, text="Select Associates File:")
+file1_label = tk.Label(root, text="Select Profiles File:")
 file1_label.grid(row=0, column=0, padx=10, pady=10)
 
 employee_filepath = tk.Entry(root, width=40)
@@ -189,7 +189,7 @@ file1_button = tk.Button(root, text="Browse", command=lambda: select_file(employ
 file1_button.grid(row=0, column=2, padx=10, pady=10)
 
 # File 2 selection
-file2_label = tk.Label(root, text="Select Requirement File:")
+file2_label = tk.Label(root, text="Select Open Requirements File:")
 file2_label.grid(row=1, column=0, padx=10, pady=10)
 
 requirement_filepath = tk.Entry(root, width=40)
