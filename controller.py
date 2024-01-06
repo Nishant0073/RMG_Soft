@@ -1,9 +1,11 @@
 
+from decimal import Decimal
 import pandas as pd
 from openpyxl import load_workbook
 import datetime
 import re
 import openpyxl
+from constants import *
 
 #local import 
 from requirement_class import *
@@ -17,13 +19,13 @@ class Controller:
 
     # utility functions
     def get_parsed_location(self,locations):
-        values0 = locations.split('/')
+        values0 = locations.split('/') if locations else []
         values = [v.strip().lower() for v in values0]
         return values
 
     def get_parsed_skills(self,skills):
         # Split the string based on '+'
-        main_parts = re.split(r'\s*\+\s*', skills)
+        main_parts = re.split(r'\s*\+\s*', skills) if skills else []
         
         # Remove the word 'Associate' from each part
         main_parts = [part.replace('Associate', '') for part in main_parts]
@@ -49,7 +51,7 @@ class Controller:
             # Existing Excel file path -> file to store the filtered data
 
             #creating file
-            excel_file_path = "Matched_data_"+ str(datetime.date.today()) +'.xlsx'
+            excel_file_path = output_file_name
             df = pd.DataFrame({})
             df.to_excel(excel_file_path, index=False)
             df = pd.read_excel(excel_file_path)
@@ -69,7 +71,6 @@ class Controller:
 
     def process_files(self,input_files_tmp):
         # try:
-            
             input_files = input_files_tmp
             j=0
             requirement_skills_col = 0
@@ -77,11 +78,11 @@ class Controller:
             requirement_tech_familly_col = 0
 
             for i in input_files.requirements_data.columns:
-                if(i=="Main Skill Description"):
+                if(i== requirements_skill_col_name ):
                     requirement_skills_col = j
-                if(i=="Location"):
+                if(i== requirements_location_col_name):
                     requirement_loc_col =j
-                if(i=="Tech Family"):
+                if(i== requirements_tech_familly_col_name):
                     requirement_tech_familly_col = j
                 j = j+1
             
@@ -91,25 +92,33 @@ class Controller:
             
 
             for i in input_files.profiles_data.columns:
-                if(i=="Skills"):
+                if(i==profiles_skiLL_col_name):
                     employee_skills_col = j
-                if(i=="Location"):
+                if(i==profiles_location_col_name):
                     employee_loc_col = j
                 j = j+1
 
-
+        
+            
             for req in input_files.requirements_data.values:
-                requirement_location = self.get_parsed_location(req[requirement_loc_col])
-                requirement_skills = self.get_parsed_skills(req[requirement_skills_col])
-                requirement_tech_familly = req[requirement_tech_familly_col]
-                
+                try:
+                    requirement_location = self.get_parsed_location(req[requirement_loc_col])
+                    requirement_skills = self.get_parsed_skills(req[requirement_skills_col])
+                    requirement_tech_familly = req[requirement_tech_familly_col]
+                except Exception as e:
+                    print("Unable to requirement: "+ str(req))
+                    continue;
+
                 for emp in input_files.profiles_data.values:
-                    employee_skills = emp[employee_skills_col].split(',')
-                    employee_skills = [v.strip().lower() for v in employee_skills]
+                    try:
+                        employee_skills =  emp[employee_skills_col].split(',') if (emp[employee_skills_col] or emp[employee_skills_col]!='') else "NA"
+                        employee_skills = [v.strip().lower() for v in employee_skills]
 
-                    employee_location = emp[employee_loc_col].split(',')
-                    employee_location = [v.strip().lower() for v in employee_location]
-
+                        employee_location = emp[employee_loc_col].split(',') if (emp[employee_loc_col] or emp[employee_loc_col]!='')else "Global"
+                        employee_location = [v.strip().lower() for v in employee_location]
+                    except Exception as e:
+                        print("Unable to process profile: "+ str(emp))
+                 
                     location_satisfied = 0
                     skills_satisfied = []
 
@@ -132,7 +141,14 @@ class Controller:
                         new_row = {}
                         indx = 0
                         for col in input_files.profiles_data.columns.values:
-                            new_row[col]=emp[indx]
+                            if(type(emp[indx])==int):
+                                new_row[col]=Decimal(emp[indx])
+                            elif(type(emp[indx])==pd._libs.tslibs.timestamps.Timestamp):
+                                new_row[col]=str(emp[indx].date())
+                            else:
+                                new_row[col]=emp[indx]
+                                
+
                             indx = indx + 1
                         df = pd.DataFrame(pd.DataFrame([new_row], columns=input_files.profiles_data.columns.values))
                         # generated_excel_data
