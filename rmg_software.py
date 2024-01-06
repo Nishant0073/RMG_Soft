@@ -2,8 +2,28 @@
 import tkinter as tk
 from tkinter import filedialog
 from controller import *
-from controller import select_file
-from controller import process_and_display
+
+def select_file(entry_widget):
+    file_path = filedialog.askopenfilename()
+    entry_widget.delete(0, tk.END)
+    entry_widget.insert(0, file_path)
+
+def process_and_display():
+    global input_files
+    input_files = Input_files(employee_filepath.get(),requirement_filepath.get())
+    if input_files.profiles_file and input_files.requirements_file:
+        controller =  Controller()
+        new_excel_path = controller.process_files(input_files)
+        if(new_excel_path!="-1"):
+            if new_excel_path:
+                result_label.config(text=f"New file generated:\n{new_excel_path}"+"\n")
+            else:
+                result_label.config(text=f"No Match Found!"+"\n")
+        else:
+            result_label.config(text="Something went wrong!\n")
+    else:
+        result_label.config(text="Please select both files.")
+
 
 # Create the main Tkinter window
 root = tk.Tk()
