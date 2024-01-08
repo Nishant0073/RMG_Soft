@@ -16,6 +16,7 @@ class Controller:
 
     def __init__(self):
         self.generated_excel_data = {}
+        self.tmp_generated_data  = {}
 
     # utility functions
     def get_parsed_location(self,locations):
@@ -89,6 +90,7 @@ class Controller:
             j=0
             employee_skills_col = 0
             employee_loc_col = 0
+            profile_evaluation_status_col = 0;
             
 
             for i in input_files.profiles_data.columns:
@@ -96,6 +98,8 @@ class Controller:
                     employee_skills_col = j
                 if(i==profiles_location_col_name):
                     employee_loc_col = j
+                if(i==profile_evaluation_status_col_name):
+                    profile_evaluation_status_col = j
                 j = j+1
 
         
@@ -106,10 +110,13 @@ class Controller:
                     requirement_skills = self.get_parsed_skills(req[requirement_skills_col])
                     requirement_tech_familly = req[requirement_tech_familly_col]
                 except Exception as e:
-                    print("Unable to requirement: "+ str(req))
-                    continue;
+                    # print("Unable to requirement: "+ str(req))
+                    continue
 
-                for emp in input_files.profiles_data.values:
+                for emp in input_files.profiles_data.values: 
+                    if(emp[profile_evaluation_status_col]!=profile_evaluation_match_status):
+                        #skipping profile if status is not evaluation pending.
+                        continue
                     try:
                         employee_skills =  emp[employee_skills_col].split(',') if (emp[employee_skills_col] or emp[employee_skills_col]!='') else "NA"
                         employee_skills = [v.strip().lower() for v in employee_skills]
@@ -117,7 +124,8 @@ class Controller:
                         employee_location = emp[employee_loc_col].split(',') if (emp[employee_loc_col] or emp[employee_loc_col]!='')else "Global"
                         employee_location = [v.strip().lower() for v in employee_location]
                     except Exception as e:
-                        print("Unable to process profile: "+ str(emp))
+                        # print("Unable to process profile: "+ str(emp))
+                        pass
                  
                     location_satisfied = 0
                     skills_satisfied = []
@@ -152,10 +160,12 @@ class Controller:
                             indx = indx + 1
                         df = pd.DataFrame(pd.DataFrame([new_row], columns=input_files.profiles_data.columns.values))
                         # generated_excel_data
-                        if requirement_tech_familly in self.generated_excel_data:
+                        if (requirement_tech_familly in self.generated_excel_data and new_row['Emp No'] not in self.tmp_generated_data[requirement_tech_familly]):
                             self.generated_excel_data[requirement_tech_familly].append(df)
+                            self.tmp_generated_data[requirement_tech_familly].append(new_row['Emp No'])
                         else:
                             self.generated_excel_data.update({requirement_tech_familly : [df]})
+                            self.tmp_generated_data.update({requirement_tech_familly : [new_row['Emp No']]})
 
             return self.savaDataToExcel() 
         # except Exception as e:
