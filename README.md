@@ -11,8 +11,8 @@ A program to filter profiles based on open requirements.
 -  After extraction, open RMG_Soft-main(extracted) folder in powershell(recommended) or cmd.
 -  Run the following command to install required python libraries:
             ``` pip install -r requirements.txt ```
--  After successfull execution of command, run the main program file "software_v1.py" using following command:
-        ``` python .\software_v1.py ```
+-  After successfull execution of command, run the main program file "rmg_software.py" using following command:
+        ``` python .\rmg_software.py ```
 - And your Done!  
 
 
