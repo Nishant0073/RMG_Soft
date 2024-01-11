@@ -15,4 +15,10 @@ A program to filter profiles based on open requirements.
         ``` python .\rmg_software.py ```
 - And your Done!  
 
-
+## How does it works
+- It takes two input files:
+     1. Open_Requirement.xlsx -> This file contains list of open requirements
+     2. Profile.xlsx  -> This file contains list of profiles.
+- Select file using browse buttons
+       
+     
