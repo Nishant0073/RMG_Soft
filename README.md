@@ -19,6 +19,8 @@ A program to filter profiles based on open requirements.
 - It takes two input files:
      1. Open_Requirement.xlsx -> This file contains list of open requirements
      2. Profile.xlsx  -> This file contains list of profiles.
+     3. 
 - Select file using browse buttons
+       - <img src="https://github.com/Nishant0073/RMG_Soft/blob/main/Software.png" width="400" height="150" />
        
      
